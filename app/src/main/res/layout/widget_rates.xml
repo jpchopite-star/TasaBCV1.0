@@ -46,7 +46,7 @@
         android:paddingEnd="8dp">
 
         <TextView
-            android:layout_width="44dp"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:text="USD"
@@ -62,7 +62,7 @@
             android:maxLines="1"
             android:text="—"
             android:textColor="@color/text_primary"
-            android:textSize="26sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/usd_change"
@@ -82,7 +82,7 @@
         android:paddingEnd="8dp">
 
         <TextView
-            android:layout_width="44dp"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
             android:text="EUR"
@@ -98,10 +98,48 @@
             android:maxLines="1"
             android:text="—"
             android:textColor="@color/text_primary"
-            android:textSize="26sp" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/eur_change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <!-- Binance P2P (market) -->
+    <LinearLayout
+        android:id="@+id/mkt_row"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingEnd="8dp">
+
+        <TextView
+            android:id="@+id/mkt_label"
+            android:layout_width="48dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="USDT"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/mkt_value"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif"
+            android:maxLines="1"
+            android:text="—"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/mkt_gap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"

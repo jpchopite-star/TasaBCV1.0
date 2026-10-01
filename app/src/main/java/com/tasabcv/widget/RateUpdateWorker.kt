@@ -19,6 +19,7 @@ class RateUpdateWorker(ctx: Context, params: WorkerParameters) : CoroutineWorker
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
+            runCatching { MarketRepository.save(applicationContext, MarketRepository.fetch()) }
             RateRepository.save(applicationContext, RateRepository.fetch())
             RateWidgetProvider.refreshAll(applicationContext, error = false)
             Result.success()

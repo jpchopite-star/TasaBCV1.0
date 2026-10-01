@@ -91,6 +91,29 @@ class RateWidgetProvider : AppWidgetProvider() {
             row(R.id.usd_value, R.id.usd_change, snap.usd, snap.usdPrev)
             row(R.id.eur_value, R.id.eur_change, snap.eur, snap.eurPrev)
 
+            // Binance P2P line: rate + gap vs BCV
+            val mkt = MarketRepository.load(ctx)
+            if (mkt == null) {
+                v.setTextViewText(R.id.mkt_value, "—")
+                v.setViewVisibility(R.id.mkt_gap, View.GONE)
+            } else {
+                v.setTextViewText(R.id.mkt_label, if (mkt.source == MarketRepository.SOURCE_BINANCE) "USDT" else "PAR")
+                v.setTextViewText(R.id.mkt_value, formatRate(mkt.value))
+                val bcv = snap.usd?.value
+                if (bcv != null && bcv > 0) {
+                    val pct = (mkt.value / bcv - 1) * 100
+                    val f = NumberFormat.getNumberInstance(ve).apply {
+                        minimumFractionDigits = 1; maximumFractionDigits = 1
+                    }
+                    val txt = (if (pct >= 0) "+" else "−") + f.format(kotlin.math.abs(pct)) + " %"
+                    v.setViewVisibility(R.id.mkt_gap, View.VISIBLE)
+                    v.setTextViewText(R.id.mkt_gap, ctx.getString(R.string.widget_gap, txt))
+                    v.setTextColor(R.id.mkt_gap, ctx.getColor(if (pct >= 0) R.color.up else R.color.down))
+                } else {
+                    v.setViewVisibility(R.id.mkt_gap, View.GONE)
+                }
+            }
+
             val u = snap.usd?.date
             val e = snap.eur?.date
             val dateLine = when {

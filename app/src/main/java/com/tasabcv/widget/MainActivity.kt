@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
@@ -24,7 +25,9 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.text.DateFormat
 import java.text.NumberFormat
+import java.util.Date
 import java.util.Locale
 
 /** Companion screen: today's rates, a USD/EUR ⇄ Bs calculator, refresh and widget helpers. */
@@ -40,6 +43,11 @@ class MainActivity : Activity(), CoroutineScope by MainScope() {
     private lateinit var result: TextView
     private lateinit var rateUsed: TextView
     private lateinit var inSymbol: TextView
+    private lateinit var compareBox: View
+    private lateinit var compareTitle: TextView
+    private lateinit var compareValue: TextView
+    private lateinit var compareDiff: TextView
+    private lateinit var compareNote: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +59,11 @@ class MainActivity : Activity(), CoroutineScope by MainScope() {
         result = findViewById(R.id.result)
         rateUsed = findViewById(R.id.rate_used)
         inSymbol = findViewById(R.id.in_symbol)
+        compareBox = findViewById(R.id.compare_box)
+        compareTitle = findViewById(R.id.compare_title)
+        compareValue = findViewById(R.id.compare_value)
+        compareDiff = findViewById(R.id.compare_diff)
+        compareNote = findViewById(R.id.compare_note)
 
         show()
 
@@ -134,6 +147,53 @@ class MainActivity : Activity(), CoroutineScope by MainScope() {
         val out = convert(value) ?: 0.0
         result.text = if (reversed) "$symbol ${money(out)}" else "Bs. ${money(out)}"
         rateUsed.text = getString(R.string.rate_used, RateWidgetProvider.formatRate(rate), code)
+        compare(value, rate)
+    }
+
+    /** BCV vs Binance for the amount typed. Only for USD (Binance has no EUR/VES market). */
+    private fun compare(value: Double, bcv: Double) {
+        val mkt = MarketRepository.load(this)
+        if (!isUsd || mkt == null || value <= 0) {
+            compareBox.visibility = View.GONE
+            return
+        }
+        compareBox.visibility = View.VISIBLE
+        val pct = percent(mkt.value / bcv - 1)
+        compareNote.setText(
+            if (mkt.source == MarketRepository.SOURCE_BINANCE) R.string.compare_note else R.string.compare_note_paralelo
+        )
+        if (!reversed) {
+            // Dollars -> Bs: how many Bs you get at each rate.
+            val atBcv = value * bcv
+            val atMkt = value * mkt.value
+            val diff = atMkt - atBcv
+            compareTitle.text = getString(R.string.compare_title_to_bs, mkt.source)
+            compareValue.text = "Bs. ${money(atMkt)}"
+            compareDiff.text = getString(
+                if (diff >= 0) R.string.gain_bs else R.string.loss_bs, money(kotlin.math.abs(diff)), pct
+            )
+            compareDiff.setTextColor(getColor(if (diff >= 0) R.color.up else R.color.down))
+        } else {
+            // Bs -> dollars: how many dollars you need to get that many Bs.
+            val atBcv = value / bcv
+            val atMkt = value / mkt.value
+            val saved = atBcv - atMkt
+            compareTitle.text = getString(R.string.compare_title_from_bs, mkt.source)
+            compareValue.text = "$ ${money(atMkt)}"
+            compareDiff.text = getString(
+                if (saved >= 0) R.string.save_usd else R.string.extra_usd, money(kotlin.math.abs(saved)), pct
+            )
+            compareDiff.setTextColor(getColor(if (saved >= 0) R.color.up else R.color.down))
+        }
+    }
+
+    /** +11,1 % style, always signed. */
+    private fun percent(fraction: Double): String {
+        val f = NumberFormat.getNumberInstance(ve).apply {
+            minimumFractionDigits = 1; maximumFractionDigits = 1
+        }
+        val sign = if (fraction >= 0) "+" else "−"
+        return "$sign${f.format(kotlin.math.abs(fraction * 100))} %"
     }
 
     /**
@@ -168,6 +228,7 @@ class MainActivity : Activity(), CoroutineScope by MainScope() {
         findViewById<TextView>(R.id.status).setText(R.string.updating)
         launch {
             val ok = withContext(Dispatchers.IO) {
+                runCatching { MarketRepository.save(this@MainActivity, MarketRepository.fetch()) }
                 runCatching { RateRepository.save(this@MainActivity, RateRepository.fetch()) }.isSuccess
             }
             RateWidgetProvider.refreshAll(this@MainActivity, error = !ok)
@@ -183,6 +244,29 @@ class MainActivity : Activity(), CoroutineScope by MainScope() {
         findViewById<TextView>(R.id.status).text = s.usd?.let {
             getString(R.string.value_date, RateWidgetProvider.formatDay(it.date))
         } ?: getString(R.string.no_data)
+
+        val mkt = MarketRepository.load(this)
+        val label = findViewById<TextView>(R.id.mkt_label)
+        val gap = findViewById<TextView>(R.id.mkt_gap)
+        if (mkt == null) {
+            findViewById<TextView>(R.id.mkt_value).text = "—"
+            findViewById<TextView>(R.id.mkt_time).setText(R.string.mkt_none)
+            gap.text = ""
+        } else {
+            label.setText(
+                if (mkt.source == MarketRepository.SOURCE_BINANCE) R.string.mkt_label_binance else R.string.mkt_label_paralelo
+            )
+            findViewById<TextView>(R.id.mkt_value).text = RateWidgetProvider.formatRate(mkt.value)
+            findViewById<TextView>(R.id.mkt_time).text = getString(
+                R.string.mkt_time, DateFormat.getTimeInstance(DateFormat.SHORT, ve).format(Date(mkt.time))
+            )
+            val bcv = s.usd?.value
+            if (bcv != null && bcv > 0) {
+                val f = mkt.value / bcv - 1
+                gap.text = percent(f)
+                gap.setTextColor(getColor(if (f >= 0) R.color.up else R.color.down))
+            } else gap.text = ""
+        }
         calculate()
     }
 

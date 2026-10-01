@@ -20,4 +20,18 @@
     <string name="rate_used">Tasa: %1$s Bs por %2$s · toca el resultado para copiar</string>
     <string name="no_rate">Aún no hay tasa. Pulsa Actualizar.</string>
     <string name="show_credit">Mostrar firma «By Juan Diaz»</string>
+    <string name="mkt_label_binance">Binance P2P · USDT</string>
+    <string name="mkt_label_paralelo">Paralelo · USD</string>
+    <string name="mkt_gap_caption">vs. BCV</string>
+    <string name="mkt_time">Actualizado %1$s</string>
+    <string name="mkt_none">Sin datos de mercado</string>
+    <string name="compare_title_to_bs">Si cambias en %1$s recibes</string>
+    <string name="compare_title_from_bs">En %1$s necesitas</string>
+    <string name="gain_bs">Ganas Bs. %1$s más que a tasa BCV (%2$s)</string>
+    <string name="loss_bs">Pierdes Bs. %1$s frente a la tasa BCV (%2$s)</string>
+    <string name="save_usd">Ahorras $ %1$s frente a la tasa BCV (%2$s)</string>
+    <string name="extra_usd">Necesitas $ %1$s más que a tasa BCV (%2$s)</string>
+    <string name="compare_note">Estimado con la mediana de los 5 mejores anuncios de venta de USDT. El precio final depende del anuncio que elijas.</string>
+    <string name="compare_note_paralelo">Binance no respondió; se usa el promedio del dólar paralelo como referencia.</string>
+    <string name="widget_gap">%1$s vs BCV</string>
 </resources>
