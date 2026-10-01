@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">Tasa BCV</string>
+    <string name="widget_label">Tasa BCV</string>
+    <string name="widget_description">Tasa oficial del BCV para USD y EUR, actualizada a diario</string>
+    <string name="header">TASA OFICIAL BCV · Bs.</string>
+    <string name="refresh">Actualizar</string>
+    <string name="updating">Actualizando…</string>
+    <string name="offline">Sin conexión · mostrando última tasa</string>
+    <string name="no_data">Sin datos todavía</string>
+    <string name="value_date">Fecha valor: %1$s</string>
+    <string name="checked_at">Revisado a las %1$s</string>
+    <string name="pin">Añadir widget a la pantalla de inicio</string>
+    <string name="pin_manual">Mantén pulsada la pantalla de inicio → Widgets → Tasa BCV</string>
+    <string name="battery">Ajustes de batería de la app</string>
+    <string name="battery_hint">Consejo para Samsung: en Batería, elige «Sin restricciones» para que la tasa se actualice sola cada día aunque no abras la app.</string>
+    <string name="credit">By Juan Diaz</string>
+    <string name="calc_title">CALCULADORA</string>
+    <string name="swap">Invertir conversión</string>
+    <string name="copied">Copiado</string>
+    <string name="rate_used">Tasa: %1$s Bs por %2$s · toca el resultado para copiar</string>
+    <string name="no_rate">Aún no hay tasa. Pulsa Actualizar.</string>
+    <string name="show_credit">Mostrar firma «By Juan Diaz»</string>
+</resources>
